@@ -157,9 +157,10 @@ def create_app(
 
     @app.exception_handler(ValueError)
     async def value_error(_request: Request, exc: ValueError):
+        message = str(exc).strip() or "The synthesis request could not be processed."
         return JSONResponse(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            content=_error("invalid_value", str(exc)),
+            content=_error("invalid_value", message, {"exception": type(exc).__name__}),
         )
 
     @app.get("/")

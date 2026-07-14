@@ -112,6 +112,34 @@ def test_unknown_model_uses_consistent_error_envelope(tmp_path: Path) -> None:
     assert response.json()["error"]["code"] == "model_not_found"
 
 
+def test_empty_value_error_still_has_an_actionable_message(tmp_path: Path) -> None:
+    class FailingRuntime(FakeRuntime):
+        def synthesize(self, *_args, **_kwargs):
+            raise ValueError
+
+    settings = Settings(data_dir=tmp_path)
+    context = ServiceContext(
+        settings,
+        store=ModelStore(tmp_path),
+        runtime=FailingRuntime(),
+    )
+    with TestClient(create_app(settings, context=context)) as client:
+        response = client.post(
+            "/v1/audio/speech",
+            json={
+                "model": "v5_cis_base_nostress",
+                "input": "Valid text",
+                "voice": "ukr_igor",
+                "language": "ukr",
+            },
+        )
+
+    assert response.status_code == 422
+    assert response.json()["error"]["message"] == (
+        "The synthesis request could not be processed."
+    )
+
+
 def test_catalogue_contains_expected_license_metadata() -> None:
     assert get_model("v5_cis_base_nostress").license.commercial_use_allowed
     assert not get_model("v5_cis_ext").license.commercial_use_allowed
