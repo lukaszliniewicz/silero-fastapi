@@ -1,0 +1,78 @@
+[build-system]
+requires = ["hatchling>=1.26"]
+build-backend = "hatchling.build"
+
+[project]
+name = "silero-fastapi"
+version = "0.1.0"
+description = "A reproducible, catalogue-aware Silero TTS service for Pandrator"
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.11"
+authors = [{ name = "Lukasz Liniewicz" }]
+keywords = ["tts", "silero", "fastapi", "ukrainian", "pandrator"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+  "fastapi>=0.115,<1",
+  "numpy>=1.26,<3",
+  "platformdirs>=4.3,<5",
+  "pydantic>=2.9,<3",
+  "uvicorn[standard]>=0.34,<1",
+]
+
+[project.optional-dependencies]
+inference = [
+  "silero-stress>=1.4,<2",
+  "torch>=2.0,<3",
+]
+test = [
+  "build>=1.2,<2",
+  "httpx>=0.28,<1",
+  "pytest>=8.3,<9",
+  "pytest-cov>=6,<7",
+  "ruff>=0.9,<1",
+]
+
+[project.scripts]
+silero-fastapi = "silero_fastapi.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/silero_fastapi"]
+
+[tool.pixi.workspace]
+channels = ["conda-forge"]
+platforms = ["win-64", "linux-64"]
+requires-pixi = ">=0.68.0"
+
+[tool.pixi.dependencies]
+python = "3.11.*"
+pip = "*"
+
+[tool.pixi.pypi-dependencies]
+silero-fastapi = { path = ".", editable = true, extras = ["test"] }
+silero-stress = ">=1.4,<2"
+torch = { version = ">=2.0,<3", index = "https://download.pytorch.org/whl/cpu" }
+
+[tool.pixi.tasks]
+serve = "silero-fastapi serve"
+serve-cpu = "silero-fastapi serve --device cpu"
+test = "pytest -q"
+lint = "ruff check src tests"
+check = { depends-on = ["lint", "test"] }
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--strict-markers"
+markers = ["real_model: requires downloaded official Silero model files"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
