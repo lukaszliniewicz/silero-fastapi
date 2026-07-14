@@ -5,12 +5,14 @@ Downloaded Silero models retain their upstream licences.
 
 ## Modern CIS Base
 
-`v5_cis_base_nostress` is published under the Silero CIS Base MIT licence:
+`v5_cis_base` and `v5_cis_base_nostress` are published under the Silero CIS
+Base MIT licence:
 
 - https://github.com/snakers4/silero-models/blob/master/LICENSE_CIS
 
 The pinned model comes from:
 
+- https://models.silero.ai/models/tts/ru/v5_cis_base.pt
 - https://models.silero.ai/models/tts/ru/v5_cis_base_nostress.pt
 
 ## Other included catalogue models
@@ -33,4 +35,3 @@ responsible for confirming that their intended use complies with the licence.
 `silero-stress` is published under MIT:
 
 - https://github.com/snakers4/silero-stress/blob/master/LICENSE
-

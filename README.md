@@ -21,7 +21,7 @@ stress policy, so concurrent jobs cannot change one another's configuration.
 
 | Pack | Models | Notable coverage | Licence |
 | --- | --- | --- | --- |
-| Modern CIS Base | `v5_cis_base_nostress` | 20 regional languages; Ukrainian Igor and Roman | MIT |
+| Modern CIS Base | `v5_cis_base`, `v5_cis_base_nostress` | 20 regional languages; full-stress and regional-stress variants with the same 60 voices | MIT |
 | High-quality CIS Extended | `v5_cis_ext` | Five Ukrainian voices; expanded Kazakh, Tatar, Uzbek, Kalmyk, and Chuvash | CC BY-NC-SA 4.0 |
 | Russian v5 | `v5_5_ru` | Automatic stress, homographs, and question intonation | CC BY-NC-SA 4.0 |
 | Legacy International | `v3_en`, `v3_en_indic`, `v3_de`, `v3_es`, `v3_fr`, `v3_indic` | Older English, German, Spanish, French, and Indic voices | CC BY-NC-SA 4.0 |
@@ -65,11 +65,21 @@ The recommended MIT model is:
 silero-fastapi download v5_cis_base_nostress
 ```
 
-Non-commercial models require an explicit acknowledgement:
+Install an individual catalogue model:
 
 ```console
-silero-fastapi download v5_cis_ext --acknowledge-noncommercial
+silero-fastapi download v5_cis_ext
 ```
+
+Install and verify the complete supported catalogue, including every voice pack:
+
+```console
+silero-fastapi download-all
+```
+
+Model licences are shown in the catalogue and API. Downloads are not blocked by
+licence type; deciding whether a model is appropriate for an intended use is the
+user's responsibility.
 
 Downloads resume from a `.part` file when the upstream host supports byte
 ranges. A model is promoted into the active store only after its pinned size
@@ -160,6 +170,7 @@ silero-fastapi serve --device cpu --cpu-threads 4
 silero-fastapi catalog
 silero-fastapi catalog --json
 silero-fastapi download v5_cis_base_nostress
+silero-fastapi download-all
 silero-fastapi remove v3_en
 silero-fastapi doctor
 ```

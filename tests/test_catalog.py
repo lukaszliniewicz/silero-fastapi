@@ -25,6 +25,16 @@ def test_modern_base_is_mit_and_recommended() -> None:
     assert any(voice.id == "ru_zhadyra" for voice in model.voices)
 
 
+def test_both_current_cis_base_stress_variants_are_available() -> None:
+    full_stress = get_model("v5_cis_base")
+    regional_stress = get_model("v5_cis_base_nostress")
+    assert full_stress.voices == regional_stress.voices
+    assert full_stress.languages == regional_stress.languages
+    assert full_stress.license.id == regional_stress.license.id == "MIT"
+    assert set(full_stress.requires_stress_languages) == set(full_stress.languages)
+    assert set(regional_stress.requires_stress_languages) == {"ru", "ukr", "bel"}
+
+
 def test_extended_ukrainian_voices_are_explicitly_noncommercial() -> None:
     model = get_model("v5_cis_ext")
     ukrainian = [voice.id for voice in model.voices if voice.language == "ukr"]

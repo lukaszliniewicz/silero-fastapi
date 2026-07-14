@@ -29,7 +29,11 @@ def _parser() -> argparse.ArgumentParser:
 
     download = subparsers.add_parser("download", help="Download and verify a model")
     download.add_argument("model")
-    download.add_argument("--acknowledge-noncommercial", action="store_true")
+
+    subparsers.add_parser(
+        "download-all",
+        help="Download and verify every model in the supported catalogue",
+    )
 
     remove = subparsers.add_parser("remove", help="Remove an installed model")
     remove.add_argument("model")
@@ -92,19 +96,20 @@ def main(argv: list[str] | None = None) -> None:
         return
 
     store = ModelStore(settings.data_dir)
-    if args.command == "download":
-        spec = get_model(args.model)
-        if not spec.license.commercial_use_allowed and not args.acknowledge_noncommercial:
-            parser.error(
-                f"{spec.display_name} is non-commercial; pass --acknowledge-noncommercial"
+    if args.command in {"download", "download-all"}:
+        models = [get_model(args.model)] if args.command == "download" else MODEL_CATALOG
+        total = len(models)
+        for index, spec in enumerate(models, start=1):
+            print(
+                f"[{index}/{total}] {spec.display_name} ({spec.id}) [{spec.license.id}]"
             )
 
-        def report(download_status) -> None:
-            percent = download_status.progress * 100
-            print(f"\r{spec.id}: {percent:6.2f}%", end="", flush=True)
+            def report(download_status, *, model_id=spec.id) -> None:
+                percent = download_status.progress * 100
+                print(f"\r{model_id}: {percent:6.2f}%", end="", flush=True)
 
-        path = store.download(spec, progress=report)
-        print(f"\nInstalled {spec.id} at {path}")
+            path = store.download(spec, progress=report)
+            print(f"\rInstalled {spec.id} at {path}")
         return
     if args.command == "remove":
         spec = get_model(args.model)
@@ -122,4 +127,3 @@ def main(argv: list[str] | None = None) -> None:
 
 if __name__ == "__main__":
     main()
-

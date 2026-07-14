@@ -89,11 +89,18 @@ def test_speech_is_stateless_and_returns_provenance_headers(tmp_path: Path) -> N
     assert response.headers["x-request-id"] == "request-123"
 
 
-def test_noncommercial_download_requires_acknowledgement(tmp_path: Path) -> None:
+def test_noncommercial_download_is_not_gated_by_acknowledgement(
+    tmp_path: Path, monkeypatch
+) -> None:
+    monkeypatch.setattr(
+        "silero_fastapi.service.ServiceContext.start_download",
+        lambda self, spec: self.store.mark_queued(spec),
+    )
     with _client(tmp_path) as client:
         response = client.post("/v1/models/v5_cis_ext/download", json={})
-    assert response.status_code == 409
-    assert response.json()["error"]["code"] == "license_acknowledgement_required"
+    assert response.status_code == 202
+    assert response.json()["model"] == "v5_cis_ext"
+    assert response.json()["state"] == "queued"
 
 
 def test_api_key_protects_generation_but_not_health(tmp_path: Path) -> None:

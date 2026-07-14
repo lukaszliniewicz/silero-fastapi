@@ -40,6 +40,8 @@ class AccentResponse(BaseModel):
 
 
 class ModelDownloadRequest(BaseModel):
+    # Kept for compatibility with early clients. Licence information is exposed
+    # by the catalogue, but acknowledgement is not a download gate.
     acknowledge_noncommercial: bool = False
 
 
@@ -51,4 +53,3 @@ class ErrorBody(BaseModel):
 
 class ErrorEnvelope(BaseModel):
     error: ErrorBody
-

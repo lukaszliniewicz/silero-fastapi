@@ -216,19 +216,10 @@ def create_app(
     @app.post("/v1/models/{model_id}/download", status_code=202)
     def download_model(
         model_id: str,
-        request: ModelDownloadRequest,
+        _request: ModelDownloadRequest,
         service: Context,
     ) -> dict[str, object]:
         spec = service.model(model_id)
-        if not spec.license.commercial_use_allowed and not request.acknowledge_noncommercial:
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail=_error(
-                    "license_acknowledgement_required",
-                    f"{spec.display_name} is licensed for non-commercial use.",
-                    {"license": spec.license.id, "url": spec.license.url},
-                ),
-            )
         download_status = service.start_download(spec)
         return {
             "model": spec.id,
